@@ -4,43 +4,80 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Simulador Vendas">
+<meta name="apple-mobile-web-app-title" content="Orçamento Peitoris">
 <meta name="theme-color" content="#111827">
-<title>Simulador de Vendas</title>
+<title>Orçamento — Peitoris e Soleiras</title>
 <style>
 *{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f5f5f7;color:#111827}
-.wrap{max-width:520px;margin:auto;padding:16px}.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px #00000010}
-h1{font-size:23px;margin:0 0 4px}.muted{color:#6b7280;font-size:13px}.label{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
-select,input{width:100%;height:48px;border:1px solid #d1d5db;border-radius:12px;padding:0 12px;font-size:17px;background:white}
-.row{display:grid;grid-template-columns:1fr 92px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid #eee}.row:last-child{border-bottom:0}
+.wrap{max-width:620px;margin:auto;padding:14px}.card{background:white;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px #00000010}
+h1{font-size:23px;margin:0 0 4px}.muted{color:#6b7280;font-size:13px}.label{font-size:13px;font-weight:700;margin:10px 0 6px;display:block}
+input,select,textarea{width:100%;border:1px solid #d1d5db;border-radius:12px;padding:11px 12px;font-size:16px;background:white;color:#111827}
+input,select{height:46px}textarea{min-height:80px;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.row{display:grid;grid-template-columns:1fr 90px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.row:last-child{border-bottom:0}
 .name{font-weight:650;font-size:15px}.measure{font-size:13px;color:#6b7280;margin-top:2px}
-.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#f3f4f6;border-radius:14px;padding:14px}.metric small{color:#6b7280}.metric strong{display:block;font-size:20px;margin-top:5px}
+.summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#f3f4f6;border-radius:14px;padding:13px}.metric small{color:#6b7280}.metric strong{display:block;font-size:20px;margin-top:4px}
 .total{grid-column:1/-1;background:#111827;color:white}.total small{color:#d1d5db}.total strong{font-size:28px}
-button{width:100%;height:46px;border:0;border-radius:12px;font-weight:700;font-size:16px;background:#e5e7eb;color:#111827}
+button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-size:16px;margin-top:8px}.primary{background:#111827;color:white}.secondary{background:#e5e7eb;color:#111827}
+.quote{border:1px dashed #9ca3af;border-radius:14px;padding:15px;line-height:1.45}.quote h2{margin:0 0 10px;font-size:19px}.quote table{width:100%;border-collapse:collapse;font-size:13px}.quote th,.quote td{text-align:left;padding:6px 3px;border-bottom:1px solid #e5e7eb}.quote th:last-child,.quote td:last-child{text-align:right}
 .note{font-size:12px;color:#6b7280;line-height:1.45}
-@media(max-width:360px){.wrap{padding:10px}.row{grid-template-columns:1fr 82px}}
+@media(max-width:380px){.grid2{grid-template-columns:1fr}.row{grid-template-columns:1fr 82px}}
+@media print{body{background:white}.wrap{max-width:none}.no-print{display:none!important}.card{box-shadow:none;border:0}.quote{border:0}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <div class="card">
-<h1>Simulador de Vendas</h1><div class="muted">Peitoris e soleiras • Região dos Lagos</div>
+<h1>Orçamento de Peitoris e Soleiras</h1>
+<div class="muted">Simulador comercial — versão para atendimento</div>
 </div>
+
 <div class="card">
-<label class="label">TIPO DE CLIENTE</label>
+<div class="grid2">
+<div><label class="label">Nome do cliente</label><input id="cliente" placeholder="Nome / Empresa"></div>
+<div><label class="label">Telefone / WhatsApp</label><input id="telefone" inputmode="tel" placeholder="(22) 99999-9999"></div>
+</div>
+<label class="label">Endereço da entrega / obra</label>
+<input id="endereco" placeholder="Rua, número, bairro">
+<div class="grid2">
+<div><label class="label">Cidade</label><input id="cidade" placeholder="São Pedro, Cabo Frio..."></div>
+<div><label class="label">Data</label><input id="data" type="date"></div>
+</div>
+<label class="label">Tipo de cliente</label>
 <select id="tipo"><option>Loja / Cliente</option><option>Construtora</option></select>
 </div>
+
 <div class="card">
+<div class="muted">Informe apenas as quantidades. O preço é definido automaticamente pelo total do pedido.</div>
 <div id="lista"></div>
 </div>
+
 <div class="summary">
 <div class="metric"><small>Total de peças</small><strong id="qtd">0</strong></div>
 <div class="metric"><small>Faixa aplicada</small><strong id="faixa">Até 200</strong></div>
-<div class="metric total"><small>Total da venda</small><strong id="total">R$ 0,00</strong></div>
+<div class="metric"><small>Subtotal</small><strong id="subtotal">R$ 0,00</strong></div>
+<div class="metric"><small>Frete de entrega</small><strong id="freteResumo">R$ 0,00</strong></div>
+<div class="metric total"><small>TOTAL FINAL</small><strong id="total">R$ 0,00</strong></div>
 </div>
-<div class="card"><button id="limpar">Limpar pedido</button></div>
-<div class="card note">Regra: até 200 peças usa VENDA &lt;200. Acima de 200, loja usa VENDA 200+ e construtora usa CONSTRUTORAS 200+. O frete de entrega não está incluído.</div>
+
+<div class="card no-print">
+<label class="label">Frete de entrega</label>
+<input id="frete" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00">
+<label class="label">Observações</label>
+<textarea id="obs" placeholder="Prazo de entrega, condições, validade do orçamento..."></textarea>
+<button class="primary" id="gerar">Gerar orçamento</button>
+<button class="secondary" id="limpar">Novo orçamento</button>
 </div>
+
+<div class="card" id="resultado" style="display:none">
+<div class="quote" id="quote"></div>
+<div class="no-print"><button class="primary" id="imprimir">Imprimir / Salvar PDF</button></div>
+</div>
+
+<div class="card note no-print">
+Regra: até 200 peças usa VENDA &lt;200. Acima de 200, Loja/Cliente usa VENDA 200+ e Construtora usa CONSTRUTORAS 200+. O custo, lucro e frete de compra não aparecem para o cliente.
+</div>
+</div>
+
 <script>
 const produtos=[
 ["Soleira","0,64 × 13 cm",27,25,23],["Soleira","0,74 × 13 cm",29,27,26],["Soleira","0,84 × 13 cm",31,29,27],
@@ -50,7 +87,31 @@ const produtos=[
 const lista=document.getElementById("lista");
 produtos.forEach((p,i)=>{const r=document.createElement("div");r.className="row";r.innerHTML=`<div><div class="name">${p[0]}</div><div class="measure">${p[1]}</div></div><input type="number" min="0" inputmode="numeric" value="0" data-i="${i}">`;lista.appendChild(r)});
 const money=v=>v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-function calc(){let q=0;document.querySelectorAll("#lista input").forEach(x=>q+=Math.max(0,Number(x.value)||0));const c=document.getElementById("tipo").value==="Construtora";let faixa=q>200?(c?"Construtoras 200+":"Venda 200+"):"Venda <200";let total=0;document.querySelectorAll("#lista input").forEach(x=>{let n=Math.max(0,Number(x.value)||0),p=produtos[Number(x.dataset.i)];let u=q>200?(c?p[4]:p[3]):p[2];total+=n*u});document.getElementById("qtd").textContent=q;document.getElementById("faixa").textContent=faixa;document.getElementById("total").textContent=money(total)}
-lista.addEventListener("input",calc);document.getElementById("tipo").addEventListener("change",calc);document.getElementById("limpar").addEventListener("click",()=>{document.querySelectorAll("#lista input").forEach(x=>x.value=0);calc()});calc();
+const esc=s=>String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+function calc(){
+let q=0;document.querySelectorAll("#lista input").forEach(x=>q+=Math.max(0,Number(x.value)||0));
+const c=document.getElementById("tipo").value==="Construtora";
+let faixa=q>200?(c?"Construtoras 200+":"Venda 200+"):"Venda <200";
+let total=0;document.querySelectorAll("#lista input").forEach(x=>{let n=Math.max(0,Number(x.value)||0),p=produtos[Number(x.dataset.i)];let u=q>200?(c?p[4]:p[3]):p[2];total+=n*u});
+let frete=Number(document.getElementById("frete").value)||0;
+document.getElementById("qtd").textContent=q;document.getElementById("faixa").textContent=faixa;document.getElementById("subtotal").textContent=money(total);document.getElementById("freteResumo").textContent=money(frete);document.getElementById("total").textContent=money(total+frete);
+return {q,faixa,total,frete};
+}
+function gerar(){
+const r=calc(), nome=document.getElementById("cliente").value, tel=document.getElementById("telefone").value, end=document.getElementById("endereco").value, cidade=document.getElementById("cidade").value, data=document.getElementById("data").value, obs=document.getElementById("obs").value;
+let linhas="";
+document.querySelectorAll("#lista input").forEach(x=>{let q=Number(x.value)||0;if(!q)return;let p=produtos[Number(x.dataset.i)],u=r.q>200?(document.getElementById("tipo").value==="Construtora"?p[4]:p[3]):p[2];linhas+=`<tr><td>${esc(p[0])}<br><small>${esc(p[1])}</small></td><td>${q}</td><td>${money(u)}</td><td>${money(q*u)}</td></tr>`});
+const d=data?new Date(data+"T12:00:00").toLocaleDateString("pt-BR"):"";
+document.getElementById("quote").innerHTML=`<h2>ORÇAMENTO</h2><p><b>Cliente:</b> ${esc(nome)}<br><b>Telefone:</b> ${esc(tel)}<br><b>Endereço:</b> ${esc(end)}<br><b>Cidade:</b> ${esc(cidade)}<br><b>Data:</b> ${d}</p><table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p><b>Total de peças:</b> ${r.q}<br><b>Subtotal:</b> ${money(r.total)}<br><b>Frete:</b> ${money(r.frete)}<br><b style="font-size:20px">TOTAL FINAL: ${money(r.total+r.frete)}</b></p>${obs?`<p><b>Observações:</b><br>${esc(obs)}</p>`:""}<p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
+document.getElementById("resultado").style.display="block";
+document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
+}
+lista.addEventListener("input",calc);document.getElementById("tipo").addEventListener("change",calc);document.getElementById("frete").addEventListener("input",calc);
+document.getElementById("gerar").addEventListener("click",gerar);
+document.getElementById("imprimir").addEventListener("click",()=>window.print());
+document.getElementById("limpar").addEventListener("click",()=>{document.querySelectorAll("input").forEach(x=>{if(x.type==="number")x.value=0;else if(x.type!=="date")x.value=""});document.getElementById("obs").value="";document.getElementById("resultado").style.display="none";document.getElementById("tipo").value="Loja / Cliente";calc()});
+document.getElementById("data").value=new Date().toISOString().slice(0,10);
+calc();
 </script>
-</body></html>
+</body>
+</html>
