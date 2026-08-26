@@ -18,7 +18,7 @@ input,select{height:46px}textarea{min-height:80px;resize:vertical}
 .summary{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#f3f4f6;border-radius:14px;padding:13px}.metric small{color:#6b7280}.metric strong{display:block;font-size:20px;margin-top:4px}
 .total{grid-column:1/-1;background:#111827;color:white}.total small{color:#d1d5db}.total strong{font-size:28px}
 button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-size:16px;margin-top:8px}.primary{background:#111827;color:white}.secondary{background:#e5e7eb;color:#111827}
-.quote{border:1px dashed #9ca3af;border-radius:14px;padding:15px;line-height:1.45}.quote .cabecalho{display:block;width:100%;height:auto;max-height:115px;object-fit:contain;margin:0 auto 8px}.quote .divisor{height:1px;background:#0b2a4a;margin:0 0 18px}.quote h2{margin:0 0 10px;font-size:19px}.quote table{width:100%;border-collapse:collapse;font-size:13px}.quote th,.quote td{text-align:left;padding:6px 3px;border-bottom:1px solid #e5e7eb}.quote th:last-child,.quote td:last-child{text-align:right}
+.quote{border:1px dashed #9ca3af;border-radius:14px;padding:15px;line-height:1.45}.quote .cabecalho{display:block;width:100%;height:auto;max-height:220px;object-fit:contain;margin:0 auto 10px}.quote .divisor{height:1px;background:#0b2a4a;margin:0 0 18px}.quote h2{margin:0 0 10px;font-size:19px}.quote table{width:100%;border-collapse:collapse;font-size:13px}.quote th,.quote td{text-align:left;padding:6px 3px;border-bottom:1px solid #e5e7eb}.quote th:last-child,.quote td:last-child{text-align:right}
 .note{font-size:12px;color:#6b7280;line-height:1.45}
 @media(max-width:380px){.grid2{grid-template-columns:1fr}.row{grid-template-columns:1fr 82px}}
 @media print{
@@ -34,8 +34,8 @@ button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-s
 
 <style>
 #listaPedidos button{margin-top:0}
-.cabecalho img{width:100%;display:block;max-height:115px;object-fit:contain}
-@media(max-width:600px){.cabecalho img{max-height:95px}}
+.cabecalho img{width:100%;display:block;max-height:170px;object-fit:contain}
+@media(max-width:600px){.cabecalho img{max-height:110px}}
 </style>
 </head>
 <body>
@@ -86,6 +86,9 @@ button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-s
 
 <div class="card" id="resultado" style="display:none">
 
+<div id="cabecalhoImpressao" class="cabecalho">
+  <img src="marmoraria_oceanica_cabecalho.jpg" alt="Marmoraria Oceânica">
+</div>
 <div class="quote" id="quote"></div>
 <div class="no-print">
   <button class="primary" id="criarPedido">✓ Criar pedido</button>
@@ -188,8 +191,7 @@ function gerar(){
     linhas+=`<tr><td>${esc(p[0])}<br><small>${esc(p[1])}</small></td><td>${q}</td><td>${money(u)}</td><td>${money(q*u)}</td></tr>`;
   });
   const d=data?new Date(data+"T12:00:00").toLocaleDateString("pt-BR"):"";
-  const cabecalho=document.getElementById("cabecalhoTemplate").innerHTML;
-  document.getElementById("quote").innerHTML=`${cabecalho}<h2>ORÇAMENTO</h2><p><b>Cliente:</b> ${esc(nome)}<br><b>Telefone:</b> ${esc(tel)}<br><b>Endereço:</b> ${esc(end)}<br><b>Cidade:</b> ${esc(cidade)}<br><b>Data:</b> ${d}</p><table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p><b>Total de peças:</b> ${r.q}<br><b>Subtotal:</b> ${money(r.total)}<br><b>Frete:</b> ${money(r.frete)}<br><b style="font-size:20px">TOTAL FINAL: ${money(r.total+r.frete)}</b></p><p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
+  document.getElementById("quote").innerHTML=`<h2>ORÇAMENTO</h2><p><b>Cliente:</b> ${esc(nome)}<br><b>Telefone:</b> ${esc(tel)}<br><b>Endereço:</b> ${esc(end)}<br><b>Cidade:</b> ${esc(cidade)}<br><b>Data:</b> ${d}</p><table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p><b>Total de peças:</b> ${r.q}<br><b>Subtotal:</b> ${money(r.total)}<br><b>Frete:</b> ${money(r.frete)}<br><b style="font-size:20px">TOTAL FINAL: ${money(r.total+r.frete)}</b></p><p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
   document.getElementById("resultado").style.display="block";
   document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
 }
@@ -222,7 +224,8 @@ function renderPedidos(){
       </div>
       <div style="margin-top:4px">${esc(p.cliente||"Cliente não informado")}</div>
       <div class="muted">${p.data?new Date(p.data+"T12:00:00").toLocaleDateString("pt-BR"):""} · ${esc(p.status)}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+        <button class="secondary" type="button" onclick="visualizarPedido(${p.numero})">👁️ Visualizar / Imprimir</button>
         <button class="secondary" type="button" onclick="alterarStatus(${p.numero})">Alterar status</button>
         <button class="secondary" type="button" onclick="excluirPedido(${p.numero})">Excluir</button>
       </div>
@@ -242,6 +245,36 @@ function criarPedido(){
   renderPedidos();
   alert(`Pedido #${String(pedido.numero).padStart(4,"0")} salvo com sucesso neste aparelho.`);
 }
+
+
+function montarQuoteDoPedido(p){
+  const linhas=(p.itens||[]).map(item=>`<tr><td>${esc(item.produto)}<br><small>${esc(item.medida)}</small></td><td>${item.qtd}</td><td>${money(Number(item.unit)||0)}</td><td>${money(Number(item.total)||0)}</td></tr>`).join("");
+  const d=p.data?new Date(p.data+"T12:00:00").toLocaleDateString("pt-BR"):"";
+  document.getElementById("quote").innerHTML=`<h2>ORÇAMENTO</h2>
+  <p><b>Pedido:</b> #${String(p.numero).padStart(4,"0")}<br>
+  <b>Cliente:</b> ${esc(p.cliente)}<br>
+  <b>Telefone:</b> ${esc(p.telefone)}<br>
+  <b>Endereço:</b> ${esc(p.endereco)}<br>
+  <b>Cidade:</b> ${esc(p.cidade)}<br>
+  <b>Data:</b> ${d}</p>
+  <table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead>
+  <tbody>${linhas}</tbody></table>
+  <p><b>Total de peças:</b> ${Number(p.qtd)||0}<br>
+  <b>Subtotal:</b> ${money(Number(p.subtotal)||0)}<br>
+  <b>Frete:</b> ${money(Number(p.frete)||0)}<br>
+  <b style="font-size:20px">TOTAL FINAL: ${money(Number(p.total)||0)}</b></p>
+  <p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
+}
+
+function visualizarPedido(numero){
+  const p=lerPedidos().find(x=>Number(x.numero)===Number(numero));
+  if(!p){alert("Pedido não encontrado.");return;}
+  montarQuoteDoPedido(p);
+  document.getElementById("resultado").style.display="block";
+  document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
+}
+
+window.visualizarPedido=visualizarPedido;
 
 function alterarStatus(numero){
   const pedidos=lerPedidos();
@@ -271,28 +304,31 @@ document.getElementById("criarPedido").addEventListener("click",criarPedido);
 
 document.getElementById("imprimir").addEventListener("click",()=>{
   const conteudo=document.getElementById("quote").innerHTML;
+  const cabecalho=document.getElementById("cabecalhoImpressao");
+  const imagem=cabecalho ? cabecalho.querySelector("img") : null;
+  const srcLogo=imagem ? imagem.getAttribute("src") : "";
   const janela=window.open("","_blank","width=800,height=900");
   if(!janela){alert("Permita pop-ups para imprimir o orçamento.");return;}
   janela.document.open();
   janela.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Orçamento - Marmoraria Oceânica</title><style>
-    *{box-sizing:border-box}
-    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111827;margin:0;padding:18px;background:white}
-    .orcamento{max-width:680px;margin:0 auto}
-    .cabecalho{display:block;width:100%;height:auto;max-height:115px;object-fit:contain;margin:0 auto 10px}
-    .divisor{height:1px;background:#0b2a4a;margin:0 0 14px}
-    h2{font-size:19px;margin:0 0 10px}
-    p{line-height:1.45;margin:8px 0}
-    table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
-    th,td{text-align:left;padding:6px 3px;border-bottom:1px solid #e5e7eb}
-    th:last-child,td:last-child{text-align:right}
-    th:nth-child(2),td:nth-child(2){text-align:center}
-    .muted{color:#6b7280;font-size:11px}
-    @media print{body{padding:0}.orcamento{max-width:none}}
-  </style></head><body><div class="orcamento">${conteudo}</div>
-  <script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script>
-  </body></html>`);
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111827;margin:0;padding:18px;background:white}
+  .orcamento{max-width:760px;margin:0 auto}
+  .cabecalho{margin:0 0 14px;padding:0}
+  .cabecalho img{display:block;width:100%;max-height:105px;object-fit:contain;object-position:center}
+  h2{font-size:20px;margin:0 0 10px}
+  p{line-height:1.4;margin:8px 0}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+  th,td{text-align:left;padding:6px 4px;border-bottom:1px solid #e5e7eb}
+  th:last-child,td:last-child{text-align:right}
+  th:nth-child(2),td:nth-child(2){text-align:center}
+  .muted{color:#6b7280;font-size:11px}
+  @media print{body{padding:0}.orcamento{max-width:none}}
+  </style></head><body><div class="orcamento"><div class="cabecalho"><img src="${srcLogo}" alt="Marmoraria Oceânica"></div>${conteudo}</div>
+  <script>window.onload=function(){setTimeout(function(){window.print();},250)};<\/script></body></html>`);
   janela.document.close();
 });
+
 document.getElementById("limpar").addEventListener("click",()=>{
   document.querySelectorAll("input").forEach(x=>{
     if(x.type==="number")x.value=0;
