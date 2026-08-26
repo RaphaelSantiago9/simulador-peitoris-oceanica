@@ -116,7 +116,28 @@ document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
 }
 lista.addEventListener("input",calc);document.getElementById("tipo").addEventListener("change",calc);document.getElementById("frete").addEventListener("input",calc);
 document.getElementById("gerar").addEventListener("click",gerar);
-document.getElementById("imprimir").addEventListener("click",()=>window.print());
+document.getElementById("imprimir").addEventListener("click",()=>{
+  const conteudo=document.getElementById("quote").innerHTML;
+  const janela=window.open("","_blank","width=800,height=900");
+  if(!janela){alert("Permita pop-ups para imprimir o orçamento.");return;}
+  janela.document.open();
+  janela.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Orçamento</title><style>
+    *{box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111827;margin:0;padding:24px;background:white}
+    .orcamento{max-width:760px;margin:0 auto}
+    h2{font-size:22px;margin:0 0 14px}
+    p{line-height:1.5;margin:10px 0}
+    table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+    th,td{text-align:left;padding:8px 5px;border-bottom:1px solid #e5e7eb}
+    th:last-child,td:last-child{text-align:right}
+    th:nth-child(2),td:nth-child(2){text-align:center}
+    .muted{color:#6b7280;font-size:12px}
+    @media print{body{padding:0}.orcamento{max-width:none}}
+  </style></head><body><div class="orcamento">${conteudo}</div>
+  <script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script>
+  </body></html>`);
+  janela.document.close();
+});
 document.getElementById("limpar").addEventListener("click",()=>{document.querySelectorAll("input").forEach(x=>{if(x.type==="number")x.value=0;else if(x.type!=="date")x.value=""});document.getElementById("obs").value="";document.getElementById("resultado").style.display="none";document.getElementById("tipo").value="Loja / Cliente";calc()});
 document.getElementById("data").value=new Date().toISOString().slice(0,10);
 calc();
