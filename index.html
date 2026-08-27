@@ -58,6 +58,13 @@ button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-s
 </div>
 <label class="label">Tipo de cliente</label>
 <select id="tipo"><option>Loja / Cliente</option><option>Construtora</option></select>
+<label class="label">Cor / material</label>
+<select id="cor">
+  <option value="Verde Ubatuba">🟢 Verde Ubatuba</option>
+  <option value="Icaraí">🟢 Icaraí</option>
+  <option value="Branco Itaúnas">⚪ Branco Itaúnas</option>
+  <option value="Preto São Gabriel">⚫ Preto São Gabriel</option>
+</select>
 </div>
 
 <div class="card">
@@ -109,14 +116,30 @@ Regra: até 200 peças usa VENDA &lt;200. Acima de 200, Loja/Cliente usa VENDA 2
 </div>
 
 <script>
-const produtos=[
-["Soleira","0,64 × 13 cm",27,25,23],["Soleira","0,74 × 13 cm",29,27,26],["Soleira","0,84 × 13 cm",31,29,27],
-["Peitoril — 2 lados","1,24 × 15 cm",48,44,41],["Peitoril — 2 lados","1,54 × 15 cm",56,54,50],["Peitoril — 2 lados","1,84 × 15 cm",66,64,58],["Peitoril — 2 lados","2,04 × 15 cm",72,70,64],
-["Peitoril com ressalto","1,24 × 15 cm",68,66,59],["Peitoril com ressalto","1,54 × 15 cm",82,80,72],["Peitoril com ressalto","1,84 × 15 cm",96,94,84],["Peitoril com ressalto","2,04 × 15 cm",106,104,93]
-];
+const tabelasPorCor={
+  "Verde Ubatuba":[
+    ["Soleira","0,64 × 13 cm",27,25,23],["Soleira","0,74 × 13 cm",29,27,26],["Soleira","0,84 × 13 cm",31,29,27],
+    ["Peitoril — 2 lados","1,24 × 15 cm",48,44,41],["Peitoril — 2 lados","1,54 × 15 cm",56,54,50],["Peitoril — 2 lados","1,84 × 15 cm",66,64,58],["Peitoril — 2 lados","2,04 × 15 cm",72,70,64],
+    ["Peitoril com ressalto","1,24 × 15 cm",68,66,59],["Peitoril com ressalto","1,54 × 15 cm",82,80,72],["Peitoril com ressalto","1,84 × 15 cm",96,94,84],["Peitoril com ressalto","2,04 × 15 cm",106,104,93]
+  ],
+  "Branco Itaúnas":[
+    ["Soleira","0,64 × 13 cm",35,33,32],["Soleira","0,74 × 13 cm",40,38,36],["Soleira","0,84 × 13 cm",43,41,39],
+    ["Peitoril — 2 lados","1,24 × 15 cm",69,65,62],["Peitoril — 2 lados","1,54 × 15 cm",83,78,75],["Peitoril — 2 lados","1,84 × 15 cm",99,93,90],["Peitoril — 2 lados","2,04 × 15 cm",109,102,100],
+    ["Peitoril com ressalto","1,24 × 15 cm",83,78,75],["Peitoril com ressalto","1,54 × 15 cm",102,96,93],["Peitoril com ressalto","1,84 × 15 cm",120,113,109],["Peitoril com ressalto","2,04 × 15 cm",133,125,120]
+  ]
+};
+// Icaraí usa os mesmos valores do Verde Ubatuba.
+tabelasPorCor["Icaraí"]=tabelasPorCor["Verde Ubatuba"];
+// Preto São Gabriel usa os mesmos valores do Branco Itaúnas.
+tabelasPorCor["Preto São Gabriel"]=tabelasPorCor["Branco Itaúnas"];
+
+function getProdutos(){
+  return tabelasPorCor[document.getElementById("cor").value]||tabelasPorCor["Verde Ubatuba"];
+}
+
 
 const lista=document.getElementById("lista");
-produtos.forEach((p,i)=>{
+getProdutos().forEach((p,i)=>{
   const r=document.createElement("div");
   r.className="row";
   r.innerHTML=`<div><div class="name">${p[0]}</div><div class="measure">${p[1]}</div></div><input type="number" min="0" inputmode="numeric" value="0" data-i="${i}">`;
@@ -133,7 +156,7 @@ function calc(){
   let faixa=q>200?(c?"Construtoras 200+":"Venda 200+"):"Venda <200";
   let total=0;
   document.querySelectorAll("#lista input").forEach(x=>{
-    let n=Math.max(0,Number(x.value)||0),p=produtos[Number(x.dataset.i)];
+    let n=Math.max(0,Number(x.value)||0),p=getProdutos()[Number(x.dataset.i)];
     let u=q>200?(c?p[4]:p[3]):p[2];
     total+=n*u;
   });
@@ -152,7 +175,7 @@ function coletarPedido(){
   document.querySelectorAll("#lista input").forEach(x=>{
     const q=Number(x.value)||0;
     if(!q)return;
-    const p=produtos[Number(x.dataset.i)];
+    const p=getProdutos()[Number(x.dataset.i)];
     const u=r.q>200
       ?(document.getElementById("tipo").value==="Construtora"?p[4]:p[3])
       :p[2];
@@ -165,6 +188,7 @@ function coletarPedido(){
     cidade:document.getElementById("cidade").value.trim(),
     data:document.getElementById("data").value,
     tipo:document.getElementById("tipo").value,
+    cor:document.getElementById("cor").value,
     observacoes:document.getElementById("obs").value.trim(),
     itens,
     qtd:r.q,
@@ -186,12 +210,12 @@ function gerar(){
   document.querySelectorAll("#lista input").forEach(x=>{
     let q=Number(x.value)||0;
     if(!q)return;
-    let p=produtos[Number(x.dataset.i)];
+    let p=getProdutos()[Number(x.dataset.i)];
     let u=r.q>200?(document.getElementById("tipo").value==="Construtora"?p[4]:p[3]):p[2];
     linhas+=`<tr><td>${esc(p[0])}<br><small>${esc(p[1])}</small></td><td>${q}</td><td>${money(u)}</td><td>${money(q*u)}</td></tr>`;
   });
   const d=data?new Date(data+"T12:00:00").toLocaleDateString("pt-BR"):"";
-  document.getElementById("quote").innerHTML=`<h2>ORÇAMENTO</h2><p><b>Cliente:</b> ${esc(nome)}<br><b>Telefone:</b> ${esc(tel)}<br><b>Endereço:</b> ${esc(end)}<br><b>Cidade:</b> ${esc(cidade)}<br><b>Data:</b> ${d}</p><table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p><b>Total de peças:</b> ${r.q}<br><b>Subtotal:</b> ${money(r.total)}<br><b>Frete:</b> ${money(r.frete)}<br><b style="font-size:20px">TOTAL FINAL: ${money(r.total+r.frete)}</b></p><p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
+  document.getElementById("quote").innerHTML=`<h2>ORÇAMENTO</h2><p><b>Cliente:</b> ${esc(nome)}<br><b>Telefone:</b> ${esc(tel)}<br><b>Endereço:</b> ${esc(end)}<br><b>Cidade:</b> ${esc(cidade)}<br><b>Material:</b> ${esc(document.getElementById("cor").value)}<br><b>Data:</b> ${d}</p><table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead><tbody>${linhas}</tbody></table><p><b>Total de peças:</b> ${r.q}<br><b>Subtotal:</b> ${money(r.total)}<br><b>Frete:</b> ${money(r.frete)}<br><b style="font-size:20px">TOTAL FINAL: ${money(r.total+r.frete)}</b></p><p class="muted">Orçamento de peitoris e soleiras prontas.</p>`;
   document.getElementById("resultado").style.display="block";
   document.getElementById("resultado").scrollIntoView({behavior:"smooth"});
 }
@@ -256,6 +280,7 @@ function montarQuoteDoPedido(p){
   <b>Telefone:</b> ${esc(p.telefone)}<br>
   <b>Endereço:</b> ${esc(p.endereco)}<br>
   <b>Cidade:</b> ${esc(p.cidade)}<br>
+  <b>Material:</b> ${esc(p.cor||"Verde Ubatuba")}<br>
   <b>Data:</b> ${d}</p>
   <table><thead><tr><th>Produto / Medida</th><th>Qtd.</th><th>Unit.</th><th>Total</th></tr></thead>
   <tbody>${linhas}</tbody></table>
@@ -298,6 +323,7 @@ window.excluirPedido=excluirPedido;
 
 lista.addEventListener("input",calc);
 document.getElementById("tipo").addEventListener("change",calc);
+document.getElementById("cor").addEventListener("change",calc);
 document.getElementById("frete").addEventListener("input",calc);
 document.getElementById("gerar").addEventListener("click",gerar);
 document.getElementById("criarPedido").addEventListener("click",criarPedido);
@@ -337,6 +363,7 @@ document.getElementById("limpar").addEventListener("click",()=>{
   document.getElementById("obs").value="";
   document.getElementById("resultado").style.display="none";
   document.getElementById("tipo").value="Loja / Cliente";
+  document.getElementById("cor").value="Verde Ubatuba";
   calc();
 });
 
