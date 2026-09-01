@@ -37,6 +37,10 @@ button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-s
 .cabecalho img{width:100%;display:block;max-height:170px;object-fit:contain}
 @media(max-width:600px){.cabecalho img{max-height:110px}}
 </style>
+
+<style>
+#painelLucro{max-width:1100px;margin:16px auto;padding:16px;border:1px solid #d1d5db;border-radius:14px;background:#f8fafc}#painelLucro h3{margin:0 0 12px}.lucroGrid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.lucroCard{background:#fff;padding:12px;border-radius:10px;border:1px solid #e5e7eb}.lucroCard b{display:block;font-size:20px;margin-top:5px}@media(max-width:700px){.lucroGrid{grid-template-columns:repeat(2,minmax(120px,1fr))}}@media print{#painelLucro{display:none!important}}
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -116,6 +120,16 @@ Os valores exibidos são os valores vigentes por produto e medida. O custo e inf
 </div>
 </div>
 
+
+<div id="painelLucro" class="admin-only">
+<h3>🔒 Resumo interno — não aparece no PDF</h3>
+<div class="lucroGrid">
+<div class="lucroCard"><small>Venda total</small><b id="adminVenda">R$ 0,00</b></div>
+<div class="lucroCard"><small>Custo total</small><b id="adminCusto">R$ 0,00</b></div>
+<div class="lucroCard"><small>Seu lucro</small><b id="adminLucro">R$ 0,00</b></div>
+<div class="lucroCard"><small>Margem</small><b id="adminMargem">0,00%</b></div>
+</div></div>
+
 <script>
 const produtos=[
 ["Soleira","0,64 × 13 cm"],["Soleira","0,74 × 13 cm"],["Soleira","0,84 × 13 cm"],
@@ -129,6 +143,26 @@ const precos={
   "Branco Itaúnas":[24,30,33,53,57,69,74,62,74,85,93],
   "Preto São Gabriel":[24,30,33,53,57,69,74,62,74,85,93]
 };
+const custos={
+  "Verde Ubatuba":[16,18,19,29,35,41,45,42,51,60,66],
+  "Icaraí":[16,18,19,29,35,41,45,42,51,60,66],
+  "Branco Itaúnas":[22,25,27,43,52,62,68,52,64,75,83],
+  "Preto São Gabriel":[22,25,27,43,52,62,68,52,64,75,83]
+};
+function atualizarLucro(){
+  const material=document.getElementById("material").value;
+  let venda=0,custo=0;
+  document.querySelectorAll("#lista input").forEach(x=>{
+    const n=Math.max(0,Number(x.value)||0),i=Number(x.dataset.i);
+    venda+=n*precos[material][i];
+    custo+=n*custos[material][i];
+  });
+  const lucro=venda-custo, margem=venda?lucro/venda*100:0;
+  document.getElementById("adminVenda").textContent=money(venda);
+  document.getElementById("adminCusto").textContent=money(custo);
+  document.getElementById("adminLucro").textContent=money(lucro);
+  document.getElementById("adminMargem").textContent=margem.toFixed(2).replace('.',',')+'%';
+}
 function precoUnitario(p){
   const material=document.getElementById("material").value;
   const i=produtos.findIndex(x=>x[0]===p[0] && x[1]===p[1]);
@@ -164,6 +198,7 @@ function calc(){
   document.getElementById("freteResumo").textContent=money(frete);
   document.getElementById("total").textContent=money(total+frete);
   atualizarPrecoMaterial();
+  atualizarLucro();
   return {q,faixa:document.getElementById("material").value,total,frete};
 }
 
@@ -344,7 +379,11 @@ document.getElementById("imprimir").addEventListener("click",()=>{
   th:nth-child(2),td:nth-child(2){text-align:center}
   .muted{color:#6b7280;font-size:11px}
   @media print{body{padding:0}.orcamento{max-width:none}}
-  </style></head><body><div class="orcamento"><div class="cabecalho"><img src="${srcLogo}" alt="Marmoraria Oceânica"></div>${conteudo}</div>
+  </style>
+<style>
+#painelLucro{max-width:1100px;margin:16px auto;padding:16px;border:1px solid #d1d5db;border-radius:14px;background:#f8fafc}#painelLucro h3{margin:0 0 12px}.lucroGrid{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px}.lucroCard{background:#fff;padding:12px;border-radius:10px;border:1px solid #e5e7eb}.lucroCard b{display:block;font-size:20px;margin-top:5px}@media(max-width:700px){.lucroGrid{grid-template-columns:repeat(2,minmax(120px,1fr))}}@media print{#painelLucro{display:none!important}}
+</style>
+</head><body><div class="orcamento"><div class="cabecalho"><img src="${srcLogo}" alt="Marmoraria Oceânica"></div>${conteudo}</div>
   <script>window.onload=function(){setTimeout(function(){window.print();},250)};<\/script></body></html>`);
   janela.document.close();
 });
