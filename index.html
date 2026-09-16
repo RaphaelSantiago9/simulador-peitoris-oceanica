@@ -61,7 +61,7 @@ button{width:100%;height:48px;border:0;border-radius:12px;font-weight:750;font-s
 <div><label class="label">Data</label><input id="data" type="date"></div>
 </div>
 <label class="label">Tipo de cliente</label>
-<select id="tipo"><option>Loja / Cliente</option><option>Construtora</option></select>
+<select id="tipo"><option>Cliente</option><option>Construtora / Material de Construção</option></select>
 <label class="label">Cor / material</label>
 <select id="material">
   <option value="Verde Ubatuba">Verde Ubatuba</option>
@@ -137,11 +137,17 @@ const produtos=[
 ["Peitoril com ressalto","1,24 × 15 cm"],["Peitoril com ressalto","1,54 × 15 cm"],["Peitoril com ressalto","1,84 × 15 cm"],["Peitoril com ressalto","2,04 × 15 cm"]
 ];
 
-const precos={
+// Preços da venda para Construtora / Material de Construção
+const precosConstrutora={
   "Verde Ubatuba":[19,21,22,37,45,53,60,53,62,70,76],
   "Icaraí":[19,21,22,37,45,53,60,53,62,70,76],
   "Branco Itaúnas":[24,30,33,53,57,69,74,62,74,85,93],
   "Preto São Gabriel":[24,30,33,53,57,69,74,62,74,85,93]
+};
+
+// Preços da venda para Cliente — Verde Ubatuba
+const precosCliente={
+  "Verde Ubatuba":[28,29,30,70,80,100,110,100,110,130,150]
 };
 const custos={
   "Verde Ubatuba":[16,18,19,29,35,41,45,42,51,60,66],
@@ -149,12 +155,19 @@ const custos={
   "Branco Itaúnas":[22,25,27,43,52,62,68,52,64,75,83],
   "Preto São Gabriel":[22,25,27,43,52,62,68,52,64,75,83]
 };
+function tabelaPrecos(){
+  const tipo=document.getElementById("tipo").value;
+  const material=document.getElementById("material").value;
+  if(tipo==="Cliente" && precosCliente[material]) return precosCliente[material];
+  return precosConstrutora[material];
+}
 function atualizarLucro(){
   const material=document.getElementById("material").value;
+  const tabela=tabelaPrecos();
   let venda=0,custo=0;
   document.querySelectorAll("#lista input").forEach(x=>{
     const n=Math.max(0,Number(x.value)||0),i=Number(x.dataset.i);
-    venda+=n*precos[material][i];
+    venda+=n*tabela[i];
     custo+=n*custos[material][i];
   });
   const lucro=venda-custo, margem=venda?lucro/venda*100:0;
@@ -166,10 +179,17 @@ function atualizarLucro(){
 function precoUnitario(p){
   const material=document.getElementById("material").value;
   const i=produtos.findIndex(x=>x[0]===p[0] && x[1]===p[1]);
-  return precos[material][i];
+  const tabela=tabelaPrecos();
+  return tabela[i];
 }
 function atualizarPrecoMaterial(){
-  document.getElementById("precoMaterial").textContent="Valores atualizados conforme tabela vigente.";
+  const tipo=document.getElementById("tipo").value;
+   const material=document.getElementById("material").value;
+   if(tipo==="Cliente" && material==="Verde Ubatuba"){
+     document.getElementById("precoMaterial").textContent="Valores de venda para Cliente — Verde Ubatuba.";
+   }else{
+     document.getElementById("precoMaterial").textContent="Valores de venda para Construtora / Material de Construção.";
+   }
 }
 
 const lista=document.getElementById("lista");
@@ -395,12 +415,13 @@ document.getElementById("limpar").addEventListener("click",()=>{
   });
   document.getElementById("obs").value="";
   document.getElementById("resultado").style.display="none";
-  document.getElementById("tipo").value="Loja / Cliente";
+  document.getElementById("tipo").value="Cliente";
   document.getElementById("material").value="Verde Ubatuba";
   calc();
 });
 
 document.getElementById("material").addEventListener("change",calc);
+document.getElementById("tipo").addEventListener("change",calc);
 document.getElementById("data").value=new Date().toISOString().slice(0,10);
 calc();
 renderPedidos();
